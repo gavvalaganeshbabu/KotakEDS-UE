@@ -16,6 +16,7 @@
       "cards",
       "cards-product",
       "cards-story",
+      "carousel-icons",
       "columns",
       "columns-feature",
       "fragment",
@@ -45,6 +46,12 @@
     "id": "carousel-hero",
     "components": [
       "carousel-hero-slide"
+    ]
+  },
+  {
+    "id": "carousel-icons",
+    "components": [
+      "carousel-icons-item"
     ]
   },
   {
