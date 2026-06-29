@@ -7,35 +7,39 @@ export default function decorate(block) {
   if (!row) return;
   const cells = [...row.children];
 
-  // identify cells by content: picture = thumbnail, lone link = video URL,
-  // short text-only = alt, the rich block = body text
-  const imageCell = cells.find((c) => c.querySelector('picture'));
-  const videoCell = cells.find((c) => c !== imageCell && c.querySelector('a'));
-  const altCell = cells.find((c) => c !== imageCell && c !== videoCell
-    && !c.querySelector('*') && c.textContent.trim() && c.textContent.trim().length < 80);
-  const textCell = cells.find((c) => c !== imageCell && c !== videoCell && c !== altCell);
+  // EDS renders a single-item block model as one cell per field, in model
+  // order: 0 = image, 1 = imageAlt, 2 = video link, 3 = text (richtext).
+  const imageCell = cells[0];
+  const altCell = cells[1];
+  const videoCell = cells[2];
+  const textCell = cells[3];
 
-  // media column: thumbnail wrapped in the video link (play overlay via CSS)
+  // media column: the thumbnail wrapped in the video link (play overlay via CSS)
   const media = document.createElement('div');
   media.className = 'columns-feature-img-col';
-  const picture = imageCell?.querySelector('picture');
-  const videoLink = videoCell?.querySelector('a');
-  if (picture && videoLink) {
-    const altText = altCell?.textContent.trim();
+  const picture = imageCell ? imageCell.querySelector('picture') : null;
+  const altText = altCell ? altCell.textContent.trim() : '';
+  if (picture) {
     if (altText) {
       const img = picture.querySelector('img');
       if (img) img.alt = altText;
     }
-    const link = document.createElement('a');
-    link.href = videoLink.getAttribute('href');
-    link.setAttribute('aria-label', videoLink.textContent.trim() || altText || 'Play video');
-    link.append(picture);
-    media.append(link);
-  } else if (picture) {
-    media.append(picture);
+    const videoLink = videoCell ? videoCell.querySelector('a') : null;
+    const videoHref = videoLink
+      ? videoLink.getAttribute('href')
+      : (videoCell && videoCell.textContent.trim());
+    if (videoHref) {
+      const link = document.createElement('a');
+      link.href = videoHref;
+      link.setAttribute('aria-label', altText || 'Play video');
+      link.append(picture);
+      media.append(link);
+    } else {
+      media.append(picture);
+    }
   }
 
-  // text column: the rich body
+  // text column: the rich body (heading + description)
   const text = document.createElement('div');
   text.className = 'columns-feature-text-col';
   if (textCell) {
