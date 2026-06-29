@@ -83,15 +83,27 @@ function createSlide(row, slideIndex, carouselId) {
   imageCol.classList.add('carousel-hero-slide-image');
   slide.append(imageCol);
 
-  // the theme cell carries the authored text-colour choice ("dark"/"light")
-  // as plain text and is not part of the visible content
+  // Find the theme cell: a short, link/image-free cell whose text is the
+  // authored colour choice. The select may render the bare value ("light")
+  // or the full label ("Light text (dark background)"), so match the leading
+  // word. Note the dark label also contains "light" ("Dark text (light
+  // background)"), so we must test the START of the string, not includes().
   const remaining = columns.filter((c) => c !== imageCol);
-  const themeCol = remaining[remaining.length - 1];
+  let themeCol = null;
   let theme = '';
-  if (themeCol && !themeCol.querySelector('a, picture, img')) {
-    theme = themeCol.textContent.trim().toLowerCase();
-  }
-  if (theme === 'light' || theme === 'dark') {
+  remaining.forEach((c) => {
+    if (themeCol || c.querySelector('a, picture, img, h1, h2, h3, h4, h5, h6')) return;
+    const txt = c.textContent.trim().toLowerCase();
+    if (txt.length > 40) return;
+    if (/^light\b/.test(txt)) {
+      theme = 'light';
+      themeCol = c;
+    } else if (/^dark\b/.test(txt)) {
+      theme = 'dark';
+      themeCol = c;
+    }
+  });
+  if (theme) {
     slide.classList.add(`carousel-hero-slide-theme-${theme}`);
     themeCol.remove();
   }
@@ -104,7 +116,7 @@ function createSlide(row, slideIndex, carouselId) {
   const content = document.createElement('div');
   content.classList.add('carousel-hero-slide-content');
   remaining
-    .filter((c) => c !== themeCol || !(theme === 'light' || theme === 'dark'))
+    .filter((c) => c !== themeCol)
     .forEach((c) => {
       while (c.firstChild) content.append(c.firstChild);
     });
