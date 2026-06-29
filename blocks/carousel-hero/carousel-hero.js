@@ -83,15 +83,28 @@ function createSlide(row, slideIndex, carouselId) {
   imageCol.classList.add('carousel-hero-slide-image');
   slide.append(imageCol);
 
-  // merge ALL remaining cells into a single content container.
+  // the theme cell carries the authored text-colour choice ("dark"/"light")
+  // as plain text and is not part of the visible content
+  const remaining = columns.filter((c) => c !== imageCol);
+  const themeCol = remaining[remaining.length - 1];
+  let theme = '';
+  if (themeCol && !themeCol.querySelector('a, picture, img')) {
+    theme = themeCol.textContent.trim().toLowerCase();
+  }
+  if (theme === 'light' || theme === 'dark') {
+    slide.classList.add(`carousel-hero-slide-theme-${theme}`);
+    themeCol.remove();
+  }
+
+  // merge ALL remaining content cells into a single content container.
   // The Universal Editor emits one cell per model field (text, cta, ...);
   // without merging, each becomes its own absolutely-positioned layer and
   // they overlap. Consolidating restores the single-content-block layout
   // the CSS is written for.
   const content = document.createElement('div');
   content.classList.add('carousel-hero-slide-content');
-  columns
-    .filter((c) => c !== imageCol)
+  remaining
+    .filter((c) => c !== themeCol || !(theme === 'light' || theme === 'dark'))
     .forEach((c) => {
       while (c.firstChild) content.append(c.firstChild);
     });

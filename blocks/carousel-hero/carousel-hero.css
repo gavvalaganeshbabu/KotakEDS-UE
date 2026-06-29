@@ -79,6 +79,16 @@
   pointer-events: none;
 }
 
+/* authored text-colour theme — overrides the default per slide, so it
+   follows the slide even when authors reorder the carousel */
+.carousel-hero .carousel-hero-slide.carousel-hero-slide-theme-dark .carousel-hero-slide-content {
+  color: #1a1a1a;
+}
+
+.carousel-hero .carousel-hero-slide.carousel-hero-slide-theme-light .carousel-hero-slide-content {
+  color: #fff;
+}
+
 /* re-enable clicks on the CTA only */
 .carousel-hero .carousel-hero-slide .carousel-hero-slide-content a {
   pointer-events: auto;

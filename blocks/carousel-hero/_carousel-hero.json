@@ -38,7 +38,17 @@
         { "component": "text", "valueType": "string", "name": "imageAlt", "label": "Image Alt Text" },
         { "component": "richtext", "name": "text", "value": "", "label": "Text", "valueType": "string" },
         { "component": "aem-content", "name": "cta", "label": "CTA Link" },
-        { "component": "text", "valueType": "string", "name": "ctaText", "label": "CTA Text" }
+        { "component": "text", "valueType": "string", "name": "ctaText", "label": "CTA Text" },
+        {
+          "component": "select",
+          "name": "theme",
+          "label": "Text Colour",
+          "value": "dark",
+          "options": [
+            { "name": "Dark text (light background)", "value": "dark" },
+            { "name": "Light text (dark background)", "value": "light" }
+          ]
+        }
       ]
     }
   ],

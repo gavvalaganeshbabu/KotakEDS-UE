@@ -197,6 +197,22 @@
         "valueType": "string",
         "name": "ctaText",
         "label": "CTA Text"
+      },
+      {
+        "component": "select",
+        "name": "theme",
+        "label": "Text Colour",
+        "value": "dark",
+        "options": [
+          {
+            "name": "Dark text (light background)",
+            "value": "dark"
+          },
+          {
+            "name": "Light text (dark background)",
+            "value": "light"
+          }
+        ]
       }
     ]
   },
