@@ -49,6 +49,7 @@
         "title",
         "hero",
         "cards",
+        "cards-product",
         "columns",
         "fragment",
         "carousel-hero",

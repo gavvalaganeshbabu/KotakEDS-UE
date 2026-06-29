@@ -1,0 +1,136 @@
+/* cards-product -- product showcase cards (Kotak "feature card" design)
+   Values extracted from source computed styles:
+   card .main-white-box (bg #fff, radius 4px, no shadow), details-box padding 25px 30px,
+   eyebrow .info-title (#333, 14px/600, uppercase), heading h4.em-title (28px/500, #333, lh 30.8px),
+   description (#666, 15px/300, lh 23px), CTA .em-cta (red, 15px/600). Grid 3-across, 30px gap. */
+
+.cards-product > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+@media (width >= 600px) {
+  .cards-product > ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (width >= 900px) {
+  .cards-product > ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cards-product > ul > li {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* image: full-width top, 16:9 like the source (384/216) with rounded top corners */
+.cards-product .cards-product-card-image {
+  line-height: 0;
+}
+
+.cards-product .cards-product-card-image:empty {
+  display: none;
+}
+
+.cards-product .cards-product-card-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 384 / 216;
+  object-fit: cover;
+  border-radius: 4px 4px 0 0;
+}
+
+/* body / details-box */
+.cards-product .cards-product-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 25px 30px;
+}
+
+/* eyebrow / category (authored as <strong> in first paragraph) */
+.cards-product .cards-product-card-body p:first-child {
+  margin: 0;
+}
+
+.cards-product .cards-product-card-body p:first-child strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* heading */
+.cards-product .cards-product-card-body h4 {
+  margin: 10px 0;
+  color: #333;
+  font-family: var(--body-font-family);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+/* description */
+/* stylelint-disable-next-line no-descending-specificity */
+.cards-product .cards-product-card-body p {
+  margin: 0;
+  color: #666;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.53;
+}
+
+/* Apply Now CTA -- push to bottom, red link with circled arrow */
+.cards-product .cards-product-card-body p:last-child {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.cards-product .cards-product-card-body p:last-child a:any-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #eb1c24;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cards-product .cards-product-card-body p:last-child a:any-link:hover {
+  color: #eb1c24;
+  text-decoration: none;
+}
+
+.cards-product .cards-product-card-body p:last-child a:any-link::after {
+  content: '';
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  background: center / contain no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23eb1c24' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M10 8l4 4-4 4'/%3E%3C/svg%3E");
+}
+
+/* If Apply Now gets EDS button-decoration, neutralize the pill button styling */
+.cards-product .cards-product-card-body a.button:any-link {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: none;
+  color: #eb1c24;
+  font: inherit;
+  font-weight: 600;
+  white-space: normal;
+}
