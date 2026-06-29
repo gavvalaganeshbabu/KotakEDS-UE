@@ -68,6 +68,32 @@ function bindEvents(block) {
   block.querySelectorAll('.carousel-hero-slide').forEach((slide) => {
     slideObserver.observe(slide);
   });
+
+  // auto-advance every 5s; pause on hover/focus and when the tab is hidden
+  const AUTOPLAY_MS = 5000;
+  let timer = null;
+  const advance = () => showSlide(block, parseInt(block.dataset.activeSlide || '0', 10) + 1);
+  const start = () => {
+    if (timer || document.hidden) return;
+    timer = window.setInterval(advance, AUTOPLAY_MS);
+  };
+  const stop = () => {
+    if (timer) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  };
+
+  block.addEventListener('mouseenter', stop);
+  block.addEventListener('mouseleave', start);
+  block.addEventListener('focusin', stop);
+  block.addEventListener('focusout', start);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stop();
+    else start();
+  });
+
+  start();
 }
 
 function createSlide(row, slideIndex, carouselId) {
