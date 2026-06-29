@@ -30,13 +30,8 @@
         {
           "component": "text",
           "valueType": "string",
-          "name": "imageAlt",
-          "label": "Thumbnail Alt Text"
-        },
-        {
-          "component": "aem-content",
           "name": "video",
-          "label": "Video Link"
+          "label": "Video Link (URL)"
         },
         {
           "component": "richtext",
