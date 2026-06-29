@@ -76,10 +76,26 @@ function createSlide(row, slideIndex, carouselId) {
   slide.setAttribute('id', `carousel-hero-${carouselId}-slide-${slideIndex}`);
   slide.classList.add('carousel-hero-slide');
 
-  row.querySelectorAll(':scope > div').forEach((column, colIdx) => {
-    column.classList.add(`carousel-hero-slide-${colIdx === 0 ? 'image' : 'content'}`);
-    slide.append(column);
-  });
+  const columns = [...row.querySelectorAll(':scope > div')];
+
+  // the cell holding the picture/img is the background image
+  const imageCol = columns.find((c) => c.querySelector('picture, img')) || columns[0];
+  imageCol.classList.add('carousel-hero-slide-image');
+  slide.append(imageCol);
+
+  // merge ALL remaining cells into a single content container.
+  // The Universal Editor emits one cell per model field (text, cta, ...);
+  // without merging, each becomes its own absolutely-positioned layer and
+  // they overlap. Consolidating restores the single-content-block layout
+  // the CSS is written for.
+  const content = document.createElement('div');
+  content.classList.add('carousel-hero-slide-content');
+  columns
+    .filter((c) => c !== imageCol)
+    .forEach((c) => {
+      while (c.firstChild) content.append(c.firstChild);
+    });
+  slide.append(content);
 
   const labeledBy = slide.querySelector('h1, h2, h3, h4, h5, h6');
   if (labeledBy) {
@@ -144,6 +160,18 @@ export default async function decorate(block) {
 
   container.append(slidesWrapper);
   block.prepend(container);
+
+  // Prioritise the first slide's image as the LCP candidate and defer the rest.
+  const slideImages = block.querySelectorAll('.carousel-hero-slide-image img');
+  slideImages.forEach((img, idx) => {
+    if (idx === 0) {
+      img.setAttribute('loading', 'eager');
+      img.setAttribute('fetchpriority', 'high');
+    } else {
+      img.setAttribute('loading', 'lazy');
+      img.removeAttribute('fetchpriority');
+    }
+  });
 
   if (!isSingleSlide) {
     bindEvents(block);
