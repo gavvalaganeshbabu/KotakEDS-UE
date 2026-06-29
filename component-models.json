@@ -189,7 +189,7 @@
       },
       {
         "component": "aem-content",
-        "name": "ctaLink",
+        "name": "cta",
         "label": "CTA Link"
       },
       {
