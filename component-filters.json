@@ -25,6 +25,12 @@
     ]
   },
   {
+    "id": "carousel-hero",
+    "components": [
+      "carousel-hero-slide"
+    ]
+  },
+  {
     "id": "columns",
     "components": [
       "column"
