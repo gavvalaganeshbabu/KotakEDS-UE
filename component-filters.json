@@ -15,6 +15,7 @@
       "hero",
       "cards",
       "cards-product",
+      "cards-story",
       "columns",
       "columns-feature",
       "fragment",
@@ -26,6 +27,12 @@
     "id": "cards-product",
     "components": [
       "cards-product-card"
+    ]
+  },
+  {
+    "id": "cards-story",
+    "components": [
+      "cards-story-card"
     ]
   },
   {
