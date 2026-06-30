@@ -35,6 +35,24 @@ async function fetchFooter(footerPath) {
       a.replaceWith(img);
     }
   });
+  // Authors may also paste a literal "<img ...>" tag as text. Find list items
+  // / paragraphs whose text contains an <img> markup string and turn it into a
+  // real image element.
+  doc.querySelectorAll('li, p').forEach((el) => {
+    if (el.querySelector('img, a')) return;
+    const raw = el.textContent;
+    if (!/<img\b/i.test(raw)) return;
+    const srcMatch = raw.match(/src\s*=\s*["']([^"']+)["']/i);
+    if (!srcMatch) return;
+    const altMatch = raw.match(/alt\s*=\s*["']([^"']*)["']/i);
+    const [, srcVal] = srcMatch;
+    const img = document.createElement('img');
+    img.src = srcVal;
+    img.alt = altMatch ? altMatch[1] : '';
+    img.loading = 'lazy';
+    el.textContent = '';
+    el.append(img);
+  });
   return doc;
 }
 
