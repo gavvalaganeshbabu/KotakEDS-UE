@@ -43,8 +43,15 @@ function closeAllMenus(menu) {
 function buildBrand(section) {
   const brand = document.createElement('div');
   brand.className = 'nav-brand';
+  if (!section) return brand;
+  // prefer a linked logo (<a><img></a>); fall back to a bare image/picture
   const logoLink = section.querySelector('a img')?.closest('a');
-  if (logoLink) brand.append(logoLink);
+  if (logoLink) {
+    brand.append(logoLink);
+  } else {
+    const pic = section.querySelector('picture, img');
+    if (pic) brand.append(pic.closest('picture') || pic);
+  }
   return brand;
 }
 
@@ -100,9 +107,9 @@ function buildTools(section) {
 
       wrapper.append(toggle, form);
       tools.append(wrapper);
-    } else {
-      tools.append(a);
     }
+    // any other links in the brand section are ignored here — the menu items
+    // belong in the second section as a list, not in tools
   });
   return tools;
 }
