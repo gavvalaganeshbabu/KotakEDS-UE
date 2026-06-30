@@ -88,62 +88,85 @@ function buildLinkColumns(section) {
  * @param {Element} section the second fragment section
  * @returns {Element} connect element
  */
+const SOCIAL_NAMES = ['facebook', 'twitter', 'youtube', 'linkedin', 'instagram'];
+
 function buildConnect(section) {
   const wrap = document.createElement('div');
   wrap.className = 'footer-connect';
-  const headings = [...section.querySelectorAll('h2, h3, h4, h5, h6')];
-  const lists = [...section.querySelectorAll('ul')];
 
-  // Connect With Us — social links become icon buttons
+  // The connect content is authored as a nested list: each top-level <li>
+  // holds a heading (the group label) and a nested <ul> of items. Walk those
+  // groups and route each by its label.
+  const groups = [];
+  section.querySelectorAll(':scope ul li').forEach((li) => {
+    const heading = li.querySelector(':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6');
+    const sublist = li.querySelector(':scope > ul');
+    if (heading && sublist) {
+      groups.push({ label: heading.textContent.trim(), list: sublist });
+    }
+  });
+
+  // Collect any images that live directly as list items (QR, badges, seals)
+  const looseImages = [...section.querySelectorAll('li > img, p > img')];
+
+  // Social group
+  const socialGroup = groups.find((g) => /connect|follow|social/i.test(g.label));
   const social = document.createElement('div');
   social.className = 'footer-social';
-  if (headings[0]) {
+  if (socialGroup) {
     const t = document.createElement('p');
     t.className = 'footer-col-title';
-    t.textContent = headings[0].textContent.trim();
+    t.textContent = socialGroup.label;
     social.append(t);
-  }
-  if (lists[0]) {
-    lists[0].classList.add('footer-social-list');
-    lists[0].querySelectorAll('a').forEach((a) => {
-      a.classList.add(`footer-social-${a.textContent.trim().toLowerCase()}`);
-      a.setAttribute('aria-label', a.textContent.trim());
+    const ul = socialGroup.list;
+    ul.className = 'footer-social-list';
+    ul.querySelectorAll(':scope > li').forEach((li) => {
+      const name = li.textContent.trim();
+      const key = name.toLowerCase();
+      if (!SOCIAL_NAMES.includes(key)) return;
+      let a = li.querySelector('a');
+      if (!a) {
+        a = document.createElement('a');
+        a.href = '#';
+        li.textContent = '';
+        li.append(a);
+      }
+      a.className = `footer-social-${key}`;
+      a.setAttribute('aria-label', name);
       a.setAttribute('target', '_blank');
       a.setAttribute('rel', 'noopener');
     });
-    social.append(lists[0]);
+    social.append(ul);
   }
   wrap.append(social);
 
-  // Install the Kotak Bank App — QR + badges
+  // App group: QR image + store badge images
   const app = document.createElement('div');
   app.className = 'footer-app';
-  if (headings[1]) {
+  const appGroup = groups.find((g) => /install|app|download/i.test(g.label));
+  if (appGroup) {
     const t = document.createElement('p');
     t.className = 'footer-col-title';
-    t.textContent = headings[1].textContent.trim();
+    t.textContent = appGroup.label;
     app.append(t);
   }
-  const qr = section.querySelector('p img');
-  if (qr) {
+  // first loose image = QR; subsequent = badges/seals
+  const qrImg = looseImages[0];
+  if (qrImg) {
     const qrWrap = document.createElement('div');
     qrWrap.className = 'footer-qr';
-    qrWrap.append(qr.closest('p'));
+    qrWrap.append(qrImg);
     app.append(qrWrap);
   }
-  const badgeList = lists.find((ul) => ul.querySelector('a img'));
-  if (badgeList) {
-    badgeList.classList.add('footer-badges');
-    app.append(badgeList);
+  const badgeImgs = looseImages.slice(1);
+  if (badgeImgs.length) {
+    const badges = document.createElement('div');
+    badges.className = 'footer-badges';
+    badgeImgs.forEach((img) => badges.append(img));
+    app.append(badges);
   }
   wrap.append(app);
 
-  // Trust seals — the UL with bare <img> (no anchor)
-  const sealList = lists.find((ul) => ul.querySelector('img') && !ul.querySelector('a img') && ul !== lists[0]);
-  if (sealList) {
-    sealList.classList.add('footer-seals');
-    wrap.append(sealList);
-  }
   return wrap;
 }
 
