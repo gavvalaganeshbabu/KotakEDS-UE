@@ -1,61 +1,51 @@
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
-function isUrlOnly(el) {
-  const t = (el.textContent || '').trim();
-  return t.length > 0 && !/\s/.test(t) && /^https?:\/\/\S+$/.test(t);
-}
-
 export default function decorate(block) {
   const rows = [...block.children];
-  const cellOf = (r) => r.querySelector(':scope > div') || r;
 
-  // accordion item rows contain an icon picture; everything else is chrome
+  // An item row is the one carrying an icon picture. Everything else is a
+  // block-level "chrome" row (title / see-all link), which may render as one
+  // row of several cells or as separate rows.
   const itemRows = rows.filter((r) => r.querySelector('picture'));
   const chromeRows = rows.filter((r) => !r.querySelector('picture'));
 
-  // chrome: a lone link/URL is the "see all" link; a lone short text is the title
+  // pull title + see-all link from the chrome rows, scanning every cell
+  let title = '';
   let seeAllHref = '';
   let seeAllText = '';
-  let title = '';
   chromeRows.forEach((r) => {
-    const cell = cellOf(r);
-    const link = cell.querySelector('a');
-    if (link) {
-      seeAllHref = link.getAttribute('href');
-      seeAllText = link.textContent.trim();
-    } else if (isUrlOnly(cell)) {
-      seeAllHref = cell.textContent.trim();
-    } else {
+    [...r.children].forEach((cell) => {
+      const link = cell.querySelector('a');
       const txt = cell.textContent.trim();
-      if (txt) {
-        // the longer non-url text is the see-all label if we already have a href
-        if (seeAllHref && !seeAllText) seeAllText = txt;
-        else if (!title) title = txt;
-        else seeAllText = txt;
+      if (link && link.getAttribute('href')) {
+        seeAllHref = link.getAttribute('href');
+        if (link.textContent.trim()) seeAllText = link.textContent.trim();
+      } else if (txt && /^https?:\/\/\S+$/.test(txt)) {
+        seeAllHref = txt;
+      } else if (txt) {
+        if (!title) title = txt;
+        else if (!seeAllText) seeAllText = txt;
       }
-    }
+    });
   });
 
   const wrapper = document.createElement('div');
   wrapper.className = 'rates-charges-inner';
 
-  // header
   const header = document.createElement('div');
   header.className = 'rates-charges-header';
   header.textContent = title || 'Rates & Charges';
   wrapper.append(header);
 
-  // accordion list
   const list = document.createElement('div');
   list.className = 'rates-charges-list';
 
   itemRows.forEach((row) => {
-    const cells = [...row.children].map((c) => c.querySelector(':scope > div') || c);
+    const cells = [...row.children];
     const iconCell = cells.find((c) => c.querySelector('picture'));
     const rest = cells.filter((c) => c !== iconCell);
-    // label: first non-empty plain-text cell; remaining rich content = panel
-    const labelCell = rest.find((c) => c.textContent.trim()
-      && !c.querySelector('h1, h2, h3, h4, h5, h6, ul, ol'));
+    // first text-only cell is the label; the rest (rich content) is the panel
+    const labelCell = rest.find((c) => c.textContent.trim());
     const panelCells = rest.filter((c) => c !== labelCell && c.textContent.trim());
 
     const item = document.createElement('div');
@@ -69,10 +59,8 @@ export default function decorate(block) {
 
     const icon = document.createElement('span');
     icon.className = 'rates-charges-item-icon';
-    if (iconCell) {
-      const pic = iconCell.querySelector('picture');
-      if (pic) icon.append(pic);
-    }
+    const pic = iconCell ? iconCell.querySelector('picture') : null;
+    if (pic) icon.append(pic);
 
     const label = document.createElement('span');
     label.className = 'rates-charges-item-label';
@@ -87,15 +75,17 @@ export default function decorate(block) {
     panel.className = 'rates-charges-item-panel';
     panel.hidden = true;
     panelCells.forEach((c) => {
-      while (c.firstChild) panel.append(c.firstChild);
+      // a panel cell may wrap its rich content in an extra div; unwrap it
+      const inner = c.querySelector(':scope > div') || c;
+      while (inner.firstChild) panel.append(inner.firstChild);
     });
 
     head.addEventListener('click', () => {
       const open = head.getAttribute('aria-expanded') === 'true';
-      // close siblings
       list.querySelectorAll('.rates-charges-item-head[aria-expanded="true"]').forEach((h) => {
         h.setAttribute('aria-expanded', 'false');
-        h.parentElement.querySelector('.rates-charges-item-panel').hidden = true;
+        const p = h.nextElementSibling;
+        if (p) p.hidden = true;
       });
       if (!open) {
         head.setAttribute('aria-expanded', 'true');
@@ -109,7 +99,6 @@ export default function decorate(block) {
 
   wrapper.append(list);
 
-  // footer see-all link
   if (seeAllHref) {
     const footer = document.createElement('div');
     footer.className = 'rates-charges-footer';
