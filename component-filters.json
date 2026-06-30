@@ -16,6 +16,7 @@
       "cards",
       "cards-product",
       "cards-story",
+      "cards-quicklink",
       "carousel-icons",
       "columns",
       "columns-feature",
@@ -28,6 +29,12 @@
     "id": "cards-product",
     "components": [
       "cards-product-card"
+    ]
+  },
+  {
+    "id": "cards-quicklink",
+    "components": [
+      "cards-quicklink-card"
     ]
   },
   {
