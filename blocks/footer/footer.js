@@ -28,21 +28,21 @@ async function fetchFooter(footerPath) {
 function buildLinkColumns(section) {
   const wrap = document.createElement('div');
   wrap.className = 'footer-columns';
-  [...section.children].forEach((node) => {
-    if (/^H[2-6]$/.test(node.tagName)) {
-      const col = document.createElement('div');
-      col.className = 'footer-col';
-      const title = document.createElement('p');
-      title.className = 'footer-col-title';
-      title.textContent = node.textContent.trim();
-      col.append(title);
-      const list = node.nextElementSibling;
-      if (list && list.tagName === 'UL') {
-        list.classList.add('footer-col-links');
-        col.append(list);
-      }
-      wrap.append(col);
+  // Headings/lists may be nested inside a content wrapper div, so find the
+  // headings anywhere in the section and pair each with the next list.
+  section.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((node) => {
+    const col = document.createElement('div');
+    col.className = 'footer-col';
+    const title = document.createElement('p');
+    title.className = 'footer-col-title';
+    title.textContent = node.textContent.trim();
+    col.append(title);
+    const list = node.nextElementSibling;
+    if (list && list.tagName === 'UL') {
+      list.classList.add('footer-col-links');
+      col.append(list);
     }
+    wrap.append(col);
   });
   return wrap;
 }
@@ -145,6 +145,8 @@ export default async function decorate(block) {
   const footer = document.createElement('div');
   footer.className = 'footer-inner';
 
+  // Columns come from the first section; connect/copyright from the next two
+  // when present. With only one authored section, just render the columns.
   if (sections[0]) footer.append(buildLinkColumns(sections[0]));
   if (sections[1]) footer.append(buildConnect(sections[1]));
   block.append(footer);
