@@ -15,6 +15,12 @@ footer p {
   margin: 0;
 }
 
+/* safety net: never let a footer image blow out the layout */
+footer img {
+  max-width: 120px;
+  height: auto;
+}
+
 /* ===== Link columns ===== */
 footer .footer-columns {
   display: grid;
