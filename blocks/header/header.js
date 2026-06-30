@@ -60,57 +60,81 @@ function buildBrand(section) {
  * @param {Element} section the first fragment section
  * @returns {Element} tools element
  */
+function buildSearchControl(searchHref) {
+  const searchPath = (searchHref || '/en/search').replace(/\.html$/, '');
+  const wrapper = document.createElement('div');
+  wrapper.className = 'nav-search';
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'nav-search-toggle';
+  toggle.setAttribute('aria-label', 'Search');
+  toggle.setAttribute('aria-expanded', 'false');
+
+  const form = document.createElement('form');
+  form.className = 'nav-search-form';
+  form.action = searchPath;
+  form.setAttribute('role', 'search');
+  const input = document.createElement('input');
+  input.type = 'search';
+  input.name = 'q';
+  input.className = 'nav-search-input';
+  input.placeholder = 'Search';
+  input.setAttribute('aria-label', 'Search');
+  form.append(input);
+
+  toggle.addEventListener('click', () => {
+    const open = wrapper.classList.toggle('nav-search-open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) input.focus();
+  });
+  form.addEventListener('submit', (e) => {
+    if (!input.value.trim()) e.preventDefault();
+  });
+
+  wrapper.append(toggle, form);
+  return wrapper;
+}
+
 function buildTools(section) {
   const tools = document.createElement('div');
   tools.className = 'nav-tools';
+  if (!section) return tools;
+
+  // Detect search/login from real links first.
   const links = [...section.querySelectorAll('a')].filter((a) => !a.querySelector('img'));
+  let hasSearch = false;
+  let hasLogin = false;
+  let searchHref = '';
+  let loginLink = null;
   links.forEach((a) => {
     const label = a.textContent.trim();
     if (/login/i.test(label)) {
-      a.className = 'nav-login';
-      a.setAttribute('aria-label', 'Login');
-      tools.append(a);
+      hasLogin = true;
+      loginLink = a;
     } else if (/search/i.test(label)) {
-      // Replace the static search link with an expanding search control:
-      // clicking the icon reveals an input; submitting navigates to the
-      // search page with the query.
-      const searchPath = (a.getAttribute('href') || '/en/search').replace(/\.html$/, '');
-      const wrapper = document.createElement('div');
-      wrapper.className = 'nav-search';
-
-      const toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'nav-search-toggle';
-      toggle.setAttribute('aria-label', 'Search');
-      toggle.setAttribute('aria-expanded', 'false');
-
-      const form = document.createElement('form');
-      form.className = 'nav-search-form';
-      form.action = searchPath;
-      form.setAttribute('role', 'search');
-      const input = document.createElement('input');
-      input.type = 'search';
-      input.name = 'q';
-      input.className = 'nav-search-input';
-      input.placeholder = 'Search';
-      input.setAttribute('aria-label', 'Search');
-      form.append(input);
-
-      toggle.addEventListener('click', () => {
-        const open = wrapper.classList.toggle('nav-search-open');
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        if (open) input.focus();
-      });
-      form.addEventListener('submit', (e) => {
-        if (!input.value.trim()) e.preventDefault();
-      });
-
-      wrapper.append(toggle, form);
-      tools.append(wrapper);
+      hasSearch = true;
+      searchHref = a.getAttribute('href');
     }
-    // any other links in the brand section are ignored here — the menu items
-    // belong in the second section as a list, not in tools
   });
+
+  // Fall back to plain text tokens (e.g. authored ":search:" / "Login")
+  // so the controls still appear when authors don't add real links.
+  const rawText = section.textContent || '';
+  if (!hasSearch && /search/i.test(rawText)) hasSearch = true;
+  if (!hasLogin && /login/i.test(rawText)) hasLogin = true;
+
+  if (hasSearch) tools.append(buildSearchControl(searchHref));
+  if (hasLogin) {
+    const a = loginLink || document.createElement('a');
+    if (!loginLink) {
+      a.href = 'https://www.kotak.bank.in/en/login.html';
+      a.textContent = 'Login';
+    }
+    a.className = 'nav-login';
+    a.setAttribute('aria-label', 'Login');
+    tools.append(a);
+  }
   return tools;
 }
 
