@@ -173,21 +173,10 @@ function buildMenu(section) {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
+  // Mirror the footer block's resolution: default to the bare "/nav" path,
+  // which the delivery host maps to the site's nav page (same as "/footer").
   const navMeta = getMetadata('nav');
-  let navPath;
-  if (navMeta) {
-    navPath = new URL(navMeta, window.location).pathname;
-  } else {
-    // No nav metadata: default to a "nav" page at the site root. The content
-    // lives under /content/<site>/, so derive that base from the current path
-    // (e.g. /content/kotakeds-ue/home -> /content/kotakeds-ue/nav).
-    const segments = window.location.pathname.split('/').filter(Boolean);
-    if (segments[0] === 'content' && segments.length >= 2) {
-      navPath = `/${segments[0]}/${segments[1]}/nav`;
-    } else {
-      navPath = '/nav';
-    }
-  }
+  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
   const fragment = await fetchNav(navPath);
 
   block.textContent = '';
