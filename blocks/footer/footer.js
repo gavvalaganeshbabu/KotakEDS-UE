@@ -5,6 +5,8 @@ import { getMetadata } from '../../scripts/aem.js';
  * @param {string} footerPath footer document path without the .plain.html suffix
  * @returns {Promise<Document|null>} parsed fragment document
  */
+const IMG_EXT = /\.(?:png|jpe?g|webp|gif|svg)(?:\?|$)/i;
+
 async function fetchFooter(footerPath) {
   const resp = await fetch(`${footerPath}.plain.html`);
   if (!resp.ok) return null;
@@ -15,6 +17,22 @@ async function fetchFooter(footerPath) {
     const src = img.getAttribute('src');
     if (src && !/^(https?:|\/|data:)/.test(src)) {
       img.setAttribute('src', `${baseDir}${src}`);
+    }
+  });
+  // Authors may paste image asset paths as link text instead of inserting an
+  // image. Convert any link whose href OR text is an image path into an <img>.
+  doc.querySelectorAll('a').forEach((a) => {
+    const href = a.getAttribute('href') || '';
+    const txt = a.textContent.trim();
+    let path = '';
+    if (IMG_EXT.test(href)) path = href;
+    else if (IMG_EXT.test(txt)) path = txt;
+    if (path) {
+      const img = document.createElement('img');
+      img.src = path;
+      img.alt = '';
+      img.loading = 'lazy';
+      a.replaceWith(img);
     }
   });
   return doc;
@@ -145,11 +163,34 @@ export default async function decorate(block) {
   const footer = document.createElement('div');
   footer.className = 'footer-inner';
 
-  // Columns come from the first section; connect/copyright from the next two
-  // when present. With only one authored section, just render the columns.
-  if (sections[0]) footer.append(buildLinkColumns(sections[0]));
-  if (sections[1]) footer.append(buildConnect(sections[1]));
+  // Classify each section by content rather than position:
+  // - connect: mentions "connect with us" or "install the" app, or has images
+  // - copyright: has a paragraph starting with "copyright"/"©"
+  // - columns: everything else (heading + link-list groups)
+  let connectSection = null;
+  let copyrightSection = null;
+  const columnSections = [];
+  sections.forEach((sec) => {
+    const text = (sec.textContent || '').toLowerCase();
+    if (/connect with us|install the/.test(text)) {
+      connectSection = connectSection || sec;
+    } else if (/copyright|©/.test(text)) {
+      copyrightSection = copyrightSection || sec;
+    } else {
+      columnSections.push(sec);
+    }
+  });
+
+  const columnsWrap = document.createElement('div');
+  columnsWrap.className = 'footer-columns';
+  columnSections.forEach((sec) => {
+    const built = buildLinkColumns(sec);
+    while (built.firstChild) columnsWrap.append(built.firstChild);
+  });
+  if (columnsWrap.children.length) footer.append(columnsWrap);
+
+  if (connectSection) footer.append(buildConnect(connectSection));
   block.append(footer);
 
-  if (sections[2]) block.append(buildCopyright(sections[2]));
+  if (copyrightSection) block.append(buildCopyright(copyrightSection));
 }
