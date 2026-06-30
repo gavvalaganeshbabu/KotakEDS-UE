@@ -120,58 +120,76 @@ function buildTools(section) {
  * @returns {Element} menu element
  */
 function buildMenu(section) {
-  const menu = section.querySelector('ul');
-  if (!menu) return document.createElement('ul');
+  const menu = document.createElement('ul');
   menu.className = 'nav-menu';
 
-  // Extract the leading text label of a list item and remove its source node.
-  // Handles both shapes: a bare text node and a leading <p> wrapper that does
-  // not contain a link (markdown/UE-processed nav).
-  const takeLabel = (li) => {
-    const textNode = [...li.childNodes]
-      .find((n) => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
-    if (textNode) {
-      const txt = textNode.textContent.trim();
-      textNode.remove();
-      return txt;
-    }
-    const labelP = [...li.children]
-      .find((c) => c.tagName === 'P' && !c.querySelector('a') && c.textContent.trim());
-    if (labelP) {
-      const txt = labelP.textContent.trim();
-      labelP.remove();
-      return txt;
-    }
-    return '';
-  };
+  // The menu is authored as a flat sequence: a heading (h2-h6) is a top-level
+  // nav item; the bullet list that follows it becomes that item's dropdown
+  // panel. This avoids needing nested lists in the UE rich-text editor.
+  // A heading with no following list, or a standalone link, is a plain item.
+  // gather the heading/list/link elements in document order
+  const flow = [];
+  section.querySelectorAll('h2, h3, h4, h5, h6, ul, ol, p').forEach((el) => {
+    // skip lists/paragraphs that are nested inside another captured list
+    if (el.closest('ul, ol') && (el.tagName === 'UL' || el.tagName === 'OL' || el.tagName === 'P')) return;
+    flow.push(el);
+  });
 
-  menu.querySelectorAll(':scope > li').forEach((li) => {
-    const panel = li.querySelector(':scope > ul');
-    if (panel) {
+  const makeItem = (labelText, panelList) => {
+    const li = document.createElement('li');
+    if (panelList && panelList.querySelector('a, li')) {
       li.classList.add('nav-has-panel');
       li.setAttribute('aria-expanded', 'false');
       const label = document.createElement('span');
       label.className = 'nav-label';
-      label.textContent = takeLabel(li);
+      label.textContent = labelText;
       label.setAttribute('role', 'button');
       label.setAttribute('tabindex', '0');
-      li.prepend(label);
-      panel.className = 'nav-panel';
-      if (panel.querySelector('img')) {
-        panel.classList.add('nav-panel-icons');
-        panel.querySelectorAll(':scope > li').forEach((groupLi) => {
-          if (!groupLi.querySelector(':scope > ul')) return;
-          const headTxt = takeLabel(groupLi);
-          if (headTxt) {
-            const heading = document.createElement('span');
-            heading.className = 'nav-panel-heading';
-            heading.textContent = headTxt;
-            groupLi.prepend(heading);
-          }
-        });
+      li.append(label);
+      panelList.className = 'nav-panel';
+      li.append(panelList);
+      if (panelList.querySelector('img')) panelList.classList.add('nav-panel-icons');
+    } else {
+      // plain link item
+      const a = document.createElement('a');
+      a.textContent = labelText;
+      li.append(a);
+    }
+    menu.append(li);
+  };
+
+  for (let i = 0; i < flow.length; i += 1) {
+    const el = flow[i];
+    if (/^H[2-6]$/.test(el.tagName)) {
+      const next = flow[i + 1];
+      if (next && (next.tagName === 'UL' || next.tagName === 'OL')) {
+        makeItem(el.textContent.trim(), next);
+        i += 1; // consume the list
+      } else {
+        // heading that itself wraps a link, or a label-only item
+        const link = el.querySelector('a');
+        const li = document.createElement('li');
+        if (link) li.append(link);
+        else {
+          const a = document.createElement('a');
+          a.textContent = el.textContent.trim();
+          li.append(a);
+        }
+        menu.append(li);
       }
     }
-  });
+  }
+
+  // Fallback: if no headings were used but a top-level list exists, treat each
+  // top-level <li> that contains a nested <ul> as a panel (legacy nested style)
+  if (!menu.children.length) {
+    const rootList = section.querySelector('ul');
+    if (rootList) {
+      rootList.className = 'nav-menu';
+      return rootList;
+    }
+  }
+
   return menu;
 }
 
