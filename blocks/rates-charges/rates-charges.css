@@ -1,0 +1,145 @@
+/* rates-charges — Kotak "Rates & Charges" accordion tile */
+
+.rates-charges {
+  --rc-red: #eb1c24;
+  --rc-header-bg: #6b6b6b;
+  --rc-divider: #ececec;
+  --rc-ink: #333;
+}
+
+.rates-charges .rates-charges-inner {
+  background-color: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px #f0f0f0;
+}
+
+/* dark header bar */
+.rates-charges .rates-charges-header {
+  padding: 18px 24px;
+  background-color: var(--rc-header-bg);
+  color: #fff;
+  font-family: var(--body-font-family);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* list of accordion rows */
+.rates-charges .rates-charges-list {
+  padding: 8px 24px;
+}
+
+.rates-charges .rates-charges-item {
+  border-bottom: 1px solid var(--rc-divider);
+}
+
+.rates-charges .rates-charges-item:last-child {
+  border-bottom: 0;
+}
+
+/* row header (the clickable bar) */
+.rates-charges .rates-charges-item-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  margin: 0;
+  padding: 18px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.rates-charges .rates-charges-item-icon {
+  flex: 0 0 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rates-charges .rates-charges-item-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.rates-charges .rates-charges-item-label {
+  flex: 1;
+  font-family: var(--body-font-family);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--rc-ink);
+}
+
+/* circular red chevron on the right */
+.rates-charges .rates-charges-item-chevron {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  position: relative;
+  border: 1px solid var(--rc-red);
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.rates-charges .rates-charges-item-chevron::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border: 2px solid var(--rc-red);
+  border-top: 0;
+  border-right: 0;
+  transform: translate(-50%, -65%) rotate(-45deg);
+}
+
+.rates-charges .rates-charges-item-head[aria-expanded="true"] .rates-charges-item-chevron {
+  transform: rotate(180deg);
+}
+
+/* expandable panel */
+.rates-charges .rates-charges-item-panel {
+  padding: 0 0 18px 48px;
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--rc-ink);
+}
+
+.rates-charges .rates-charges-item-panel p {
+  margin: 0 0 8px;
+}
+
+.rates-charges .rates-charges-item-panel a:any-link {
+  color: var(--rc-red);
+  text-decoration: none;
+}
+
+/* footer "See all rates" link */
+.rates-charges .rates-charges-footer {
+  padding: 18px 24px 24px;
+}
+
+.rates-charges .rates-charges-seeall:any-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--body-font-family);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--rc-red);
+  text-decoration: none;
+}
+
+.rates-charges .rates-charges-seeall:any-link::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  background: center / contain no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23eb1c24' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M10 8l4 4-4 4'/%3E%3C/svg%3E");
+}

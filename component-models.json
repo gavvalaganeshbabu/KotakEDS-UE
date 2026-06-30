@@ -371,5 +371,54 @@
         "valueType": "string"
       }
     ]
+  },
+  {
+    "id": "rates-charges",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title",
+        "value": "Rates & Charges"
+      },
+      {
+        "component": "aem-content",
+        "name": "seeAll",
+        "label": "See-all Link"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "seeAllText",
+        "label": "See-all Text",
+        "value": "See all rates"
+      }
+    ]
+  },
+  {
+    "id": "rates-charges-row",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "icon",
+        "label": "Icon",
+        "multi": false
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Label"
+      },
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Expanded Content",
+        "valueType": "string"
+      }
+    ]
   }
 ]

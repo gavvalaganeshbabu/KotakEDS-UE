@@ -20,6 +20,7 @@
       "carousel-icons",
       "columns",
       "columns-feature",
+      "rates-charges",
       "fragment",
       "carousel-hero",
       "hero-slide"
@@ -74,6 +75,12 @@
       "image",
       "button",
       "title"
+    ]
+  },
+  {
+    "id": "rates-charges",
+    "components": [
+      "rates-charges-row"
     ]
   }
 ]
