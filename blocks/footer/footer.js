@@ -94,68 +94,60 @@ function buildConnect(section) {
   const wrap = document.createElement('div');
   wrap.className = 'footer-connect';
 
-  // The connect content is authored as a nested list: each top-level <li>
-  // holds a heading (the group label) and a nested <ul> of items. Walk those
-  // groups and route each by its label.
-  const groups = [];
-  section.querySelectorAll(':scope ul li').forEach((li) => {
-    const heading = li.querySelector(':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6');
-    const sublist = li.querySelector(':scope > ul');
-    if (heading && sublist) {
-      groups.push({ label: heading.textContent.trim(), list: sublist });
-    }
-  });
-
-  // Collect any images that live directly as list items (QR, badges, seals)
-  const looseImages = [...section.querySelectorAll('li > img, p > img')];
-
-  // Social group
-  const socialGroup = groups.find((g) => /connect|follow|social/i.test(g.label));
+  // --- Social: structure-independent. Find every element whose text is a
+  // known social name and rebuild a clean icon list, regardless of nesting. ---
   const social = document.createElement('div');
   social.className = 'footer-social';
-  if (socialGroup) {
+
+  // pick a label heading for the social group if one is present
+  const labelEl = [...section.querySelectorAll('h1, h2, h3, h4, h5, h6, p')]
+    .find((el) => /connect|follow|social/i.test(el.textContent || ''));
+  if (labelEl) {
     const t = document.createElement('p');
     t.className = 'footer-col-title';
-    t.textContent = socialGroup.label;
+    t.textContent = labelEl.textContent.trim();
     social.append(t);
-    const ul = socialGroup.list;
-    ul.className = 'footer-social-list';
-    ul.querySelectorAll(':scope > li').forEach((li) => {
-      const name = li.textContent.trim();
-      const key = name.toLowerCase();
-      if (!SOCIAL_NAMES.includes(key)) return;
-      let a = li.querySelector('a');
-      if (!a) {
-        a = document.createElement('a');
-        a.href = '#';
-        li.textContent = '';
-        li.append(a);
-      }
-      a.className = `footer-social-${key}`;
-      a.setAttribute('aria-label', name);
-      a.setAttribute('target', '_blank');
-      a.setAttribute('rel', 'noopener');
-    });
-    social.append(ul);
   }
+
+  const socialList = document.createElement('ul');
+  socialList.className = 'footer-social-list';
+  const seen = new Set();
+  section.querySelectorAll('a, li').forEach((el) => {
+    if (el.querySelector('a, li, ul')) return; // only leaf nodes
+    const name = el.textContent.trim();
+    const key = name.toLowerCase();
+    if (!SOCIAL_NAMES.includes(key) || seen.has(key)) return;
+    seen.add(key);
+    const href = el.tagName === 'A' ? el.getAttribute('href') : (el.querySelector('a')?.getAttribute('href'));
+    const a = document.createElement('a');
+    a.href = href || '#';
+    a.className = `footer-social-${key}`;
+    a.setAttribute('aria-label', name);
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener');
+    const li = document.createElement('li');
+    li.append(a);
+    socialList.append(li);
+  });
+  if (socialList.children.length) social.append(socialList);
   wrap.append(social);
 
-  // App group: QR image + store badge images
+  // --- App: QR + store badges from loose images ---
+  const looseImages = [...section.querySelectorAll('img')];
   const app = document.createElement('div');
   app.className = 'footer-app';
-  const appGroup = groups.find((g) => /install|app|download/i.test(g.label));
-  if (appGroup) {
+  const appLabel = [...section.querySelectorAll('h1, h2, h3, h4, h5, h6, p')]
+    .find((el) => /install|app|download/i.test(el.textContent || ''));
+  if (appLabel) {
     const t = document.createElement('p');
     t.className = 'footer-col-title';
-    t.textContent = appGroup.label;
+    t.textContent = appLabel.textContent.trim();
     app.append(t);
   }
-  // first loose image = QR; subsequent = badges/seals
-  const qrImg = looseImages[0];
-  if (qrImg) {
+  if (looseImages[0]) {
     const qrWrap = document.createElement('div');
     qrWrap.className = 'footer-qr';
-    qrWrap.append(qrImg);
+    qrWrap.append(looseImages[0]);
     app.append(qrWrap);
   }
   const badgeImgs = looseImages.slice(1);
