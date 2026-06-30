@@ -174,7 +174,20 @@ function buildMenu(section) {
  */
 export default async function decorate(block) {
   const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
+  let navPath;
+  if (navMeta) {
+    navPath = new URL(navMeta, window.location).pathname;
+  } else {
+    // No nav metadata: default to a "nav" page at the site root. The content
+    // lives under /content/<site>/, so derive that base from the current path
+    // (e.g. /content/kotakeds-ue/home -> /content/kotakeds-ue/nav).
+    const segments = window.location.pathname.split('/').filter(Boolean);
+    if (segments[0] === 'content' && segments.length >= 2) {
+      navPath = `/${segments[0]}/${segments[1]}/nav`;
+    } else {
+      navPath = '/nav';
+    }
+  }
   const fragment = await fetchNav(navPath);
 
   block.textContent = '';
