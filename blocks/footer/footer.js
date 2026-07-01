@@ -35,23 +35,32 @@ async function fetchFooter(footerPath) {
       a.replaceWith(img);
     }
   });
-  // Authors may also paste a literal "<img ...>" tag as text. Find list items
-  // / paragraphs whose text contains an <img> markup string and turn it into a
-  // real image element.
-  doc.querySelectorAll('li, p').forEach((el) => {
-    if (el.querySelector('img, a')) return;
+  // Authors may also paste literal "<img ...>" tags as text (sometimes with
+  // spaces stripped, e.g. "<imgsrc=..."). Find any element whose own text
+  // contains such markup and replace it with the real image(s).
+  doc.querySelectorAll('li, p, div, span').forEach((el) => {
+    // only act on elements that directly hold the img-markup text
+    if (!/<img/i.test(el.textContent || '')) return;
+    if (![...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && /<img/i.test(n.textContent))) return;
     const raw = el.textContent;
-    if (!/<img\b/i.test(raw)) return;
-    const srcMatch = raw.match(/src\s*=\s*["']([^"']+)["']/i);
-    if (!srcMatch) return;
-    const altMatch = raw.match(/alt\s*=\s*["']([^"']*)["']/i);
-    const [, srcVal] = srcMatch;
-    const img = document.createElement('img');
-    img.src = srcVal;
-    img.alt = altMatch ? altMatch[1] : '';
-    img.loading = 'lazy';
-    el.textContent = '';
-    el.append(img);
+    const imgTags = raw.match(/<img[^>]*>/gi);
+    if (!imgTags) return;
+    const frag = doc.createDocumentFragment();
+    imgTags.forEach((tag) => {
+      const srcMatch = tag.match(/src\s*=\s*["']([^"']+)["']/i);
+      if (!srcMatch) return;
+      const altMatch = tag.match(/alt\s*=\s*["']([^"']*)["']/i);
+      const img = document.createElement('img');
+      const [, srcVal] = srcMatch;
+      img.src = srcVal;
+      img.alt = altMatch ? altMatch[1] : '';
+      img.loading = 'lazy';
+      frag.append(img);
+    });
+    if (frag.childNodes.length) {
+      el.textContent = '';
+      el.append(frag);
+    }
   });
   return doc;
 }
