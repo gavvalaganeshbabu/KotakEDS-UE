@@ -1,0 +1,137 @@
+/* cards-quicklink: Kotak home page quick-link / feature tiles */
+
+.cards-quicklink > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+/* card */
+.cards-quicklink > ul > li {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* image fills the top of the card, edge to edge */
+.cards-quicklink .cards-quicklink-card-image {
+  line-height: 0;
+}
+
+.cards-quicklink .cards-quicklink-card-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 358 / 201;
+  object-fit: cover;
+}
+
+/* collapse the media slot when no image was authored */
+.cards-quicklink .cards-quicklink-card-image:empty {
+  display: none;
+}
+
+/* text area */
+.cards-quicklink .cards-quicklink-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 25px 30px 30px;
+}
+
+/* eyebrow (all-caps small label) */
+.cards-quicklink .cards-quicklink-card-body strong {
+  display: block;
+  margin: 0 0 10px;
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 23px;
+  letter-spacing: normal;
+  text-transform: uppercase;
+  color: #333;
+}
+
+/* heading */
+.cards-quicklink .cards-quicklink-card-body h2,
+.cards-quicklink .cards-quicklink-card-body h3,
+.cards-quicklink .cards-quicklink-card-body h4,
+.cards-quicklink .cards-quicklink-card-body h5,
+.cards-quicklink .cards-quicklink-card-body h6 {
+  margin: 10px 0;
+  font-family: var(--body-font-family);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: #333;
+}
+
+/* description */
+.cards-quicklink .cards-quicklink-card-body p {
+  margin: 0 0 10px;
+  font-family: var(--body-font-family);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 23px;
+  color: #000;
+}
+
+/* "Know more" link with red arrow */
+.cards-quicklink .cards-quicklink-card-body p:last-child {
+  margin: auto 0 0;
+  padding-top: 10px;
+}
+
+.cards-quicklink .cards-quicklink-card-body p > a:any-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--body-font-family);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 23px;
+  color: #eb1c24;
+  text-decoration: none;
+}
+
+.cards-quicklink .cards-quicklink-card-body p > a:any-link:hover {
+  color: #eb1c24;
+  text-decoration: none;
+}
+
+.cards-quicklink .cards-quicklink-card-body p > a:any-link::after {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background-color: #eb1c24;
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="black" stroke-width="2" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/><path fill="none" stroke="black" stroke-width="2" d="M10 8l4 4-4 4"/></svg>') no-repeat center / contain;
+  flex: none;
+}
+
+/* tablet: 2 columns */
+@media (width >= 600px) {
+  .cards-quicklink > ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* desktop: 3 columns */
+@media (width >= 900px) {
+  .cards-quicklink > ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .cards-quicklink .cards-quicklink-card-body h2,
+  .cards-quicklink .cards-quicklink-card-body h3,
+  .cards-quicklink .cards-quicklink-card-body h4,
+  .cards-quicklink .cards-quicklink-card-body h5,
+  .cards-quicklink .cards-quicklink-card-body h6 {
+    font-size: 28px;
+    line-height: 30.8px;
+  }
+}
