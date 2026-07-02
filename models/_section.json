@@ -54,7 +54,9 @@
         "columns-feature",
         "fragment",
         "carousel-hero",
-        "hero-slide"
+        "hero-slide",
+        "cc-steps"
+
       ]
     }
   ]

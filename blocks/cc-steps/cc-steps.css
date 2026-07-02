@@ -1,0 +1,154 @@
+/* CC Steps — "Apply online in 3 simple steps".
+   Mobile-first: stacked cards; desktop: 3-column row. */
+
+.cc-steps {
+  --cc-red: #fa1432;
+  --cc-ink: #131313;
+  --cc-muted: #666;
+  --cc-card-border: #e6e6e6;
+}
+
+.cc-steps .cc-steps-inner {
+  max-width: 1170px;
+  margin: 0 auto;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.cc-steps .cc-steps-title {
+  margin: 0 0 8px;
+  color: var(--cc-ink);
+  font-family: var(--body-font-family);
+  font-size: var(--heading-font-size-s);
+  font-weight: 700;
+}
+
+.cc-steps .cc-steps-subtitle {
+  margin: 0 auto 28px;
+  max-width: 640px;
+  color: var(--cc-muted);
+  font-size: var(--body-font-size-xs);
+}
+
+/* step cards */
+.cc-steps .cc-steps-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cc-steps .cc-steps-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 24px;
+  border: 1px solid var(--cc-card-border);
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+}
+
+.cc-steps .cc-steps-icon {
+  margin-bottom: 12px;
+  line-height: 0;
+}
+
+.cc-steps .cc-steps-icon img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.cc-steps .cc-steps-item-title {
+  margin: 0 0 6px;
+  color: var(--cc-ink);
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-xs);
+  font-weight: 700;
+}
+
+.cc-steps .cc-steps-item-title * {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.cc-steps .cc-steps-item-desc {
+  margin: 0;
+  color: var(--cc-muted);
+  font-size: var(--body-font-size-xs);
+  line-height: 1.5;
+}
+
+.cc-steps .cc-steps-item-desc p {
+  margin: 0;
+}
+
+/* CTA */
+.cc-steps .cc-steps-actions {
+  margin-top: 28px;
+}
+
+.cc-steps .cc-steps-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 28px;
+  border: 1px solid var(--cc-red);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--cc-red);
+  font-size: var(--body-font-size-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cc-steps .cc-steps-btn:hover {
+  background: #fff5f6;
+  color: var(--cc-red);
+}
+
+@media (width >= 900px) {
+  .cc-steps .cc-steps-inner {
+    padding: 16px 0;
+  }
+
+  .cc-steps .cc-steps-title {
+    font-size: var(--heading-font-size-l);
+  }
+
+  .cc-steps .cc-steps-subtitle {
+    font-size: var(--body-font-size-s);
+    margin-bottom: 36px;
+  }
+
+  /* 3-column row with a connector line behind the cards */
+  .cc-steps .cc-steps-list {
+    position: relative;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .cc-steps .cc-steps-list::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 16%;
+    right: 16%;
+    height: 1px;
+    background: linear-gradient(90deg, #00005a, var(--cc-red));
+    z-index: 0;
+  }
+
+  .cc-steps .cc-steps-item {
+    position: relative;
+    z-index: 1;
+    align-items: flex-start;
+    text-align: left;
+    padding: 32px 28px;
+  }
+}
